@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/fd11243957.js" crossorigin="anonymous"></script>
+    <title>Todo List</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link href="./style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <h1>Todos</h1>
+        </div>
+        <div class="todo_input-block">
+            <input class="todo-input" type="text" placeholder="New Todo:" minlength="1" maxlength="128">
+            <button class="btn-new"><i class="fas fa-plus"></i></button>
+        </div>
+
+        <ul class="nav nav-middle justify-content-center todo-status">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-filter="all">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-filter="in-progress">In Progress</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-filter="completed">Completed</a>
+            </li>
+        </ul>
+
+        <ul class="todo-list">
+        </ul>
+    </div>
+    <script>
+        let id = 1;
+
+        const template = `
+          <li class="todo">
+            <input class="todo-check" type="checkbox" id="todo-{id}">
+            <label class="todo-title" for="todo-{id}">{content}</label>
+            <button class="btn-delete"><i class="far fa-trash-alt"></i></button>
+          </li>
+        `
+            // 新增功能
+        $('.btn-new').click(() => {
+            addTodo()
+        });
+        $('.todo-input').keydown(e => {
+            if (e.key === 'Enter') {
+                addTodo()
+            }
+        });
+
+        // 刪除
+        $('.todo-list').on('click', '.btn-delete', e => {
+            $(e.target).parents('.todo').remove();
+        });
+
+        // 標記狀態: 已完成 / 未完成
+        $('.todo-list').on('change', '.todo-check', (e) => {
+            const target = $(e.target);
+            const isChecked = target.is(":checked");
+            if (isChecked) {
+                target.parents('.todo').addClass('checked');
+            } else {
+                target.parents('.todo').removeClass('checked');
+            }
+        });
+
+        // 篩選 todo 狀態
+        $('.todo-status').on('click', 'a', e => {
+            const target = $(e.target);
+            const filter = target.attr('data-filter');
+            $('.todo-status a.active').removeClass('active');
+            target.addClass('active');
+
+            if (filter === 'all') {
+                $('.todo').show();
+            } else if (filter === 'in-progress') {
+                $('.todo').show();
+                $('.todo.checked').hide();
+            } else { // completed
+                $('.todo').hide();
+                $('.todo.checked').show();
+            }
+        });
+
+        // 清除所有 todo
+        $('.clear-all').click(() => {
+            $('.todo').remove();
+        });
+
+        function addTodo() {
+            const value = $('.todo-input').val();
+            if (!value) return;
+            $('.todo-list').prepend(
+                template
+                .replace('{content}', escape(value))
+                .replace(/{id}/g, id)
+            );
+            id += 1;
+            $('.todo-input').val('');
+        }
+
+        function escape(toOutput) {
+            return toOutput
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+
+</html>
